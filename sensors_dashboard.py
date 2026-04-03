@@ -10,18 +10,9 @@ Exit: Press ESC or close window.
 
 import math
 import os
-import sys
-import time
-
-os.environ.setdefault("DISPLAY", ":0")
 
 import pygame
 import pygame.gfxdraw
-
-# ---------------------------------------------------------------------------
-# Import shared sensor reader
-# ---------------------------------------------------------------------------
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sensors_reader import SensorReader
 
 # ---------------------------------------------------------------------------
@@ -57,6 +48,8 @@ TARGET_W, TARGET_H = 1280, 720
 FPS = 30
 SENSOR_POLL_MS = 1000          # read sensors every 1 s
 SMOOTHING      = 0.18          # needle / value smoothing factor per frame
+
+os.environ.setdefault("DISPLAY", ":0")
 
 
 def lerp_color(c1, c2, t):
@@ -417,9 +410,11 @@ class Dashboard:
                 break
 
         if font_path:
-            mk = lambda sz: pygame.font.Font(font_path, max(8, int(sz * s)))
+            def mk(sz):
+                return pygame.font.Font(font_path, max(8, int(sz * s)))
         else:
-            mk = lambda sz: pygame.font.SysFont("dejavusans", max(8, int(sz * s)), bold=True)
+            def mk(sz):
+                return pygame.font.SysFont("dejavusans", max(8, int(sz * s)), bold=True)
 
         self.fonts = {
             "big":      mk(58),

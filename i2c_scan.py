@@ -64,7 +64,10 @@ def main():
             control = read_reg(i2c, addr, DS3231_CONTROL_REG)
             # DS3231 registers are readable; status bit 7 is OSF
             if 0x00 <= status <= 0xFF and 0x00 <= control <= 0xFF:
-                print(f"  Possible DS3231 at 0x{addr:02X} (STATUS=0x{status:02X}, CTRL=0x{control:02X})")
+                print(
+                    f"  Possible DS3231 at 0x{addr:02X} "
+                    f"(STATUS=0x{status:02X}, CTRL=0x{control:02X})"
+                )
         except Exception:
             continue
 

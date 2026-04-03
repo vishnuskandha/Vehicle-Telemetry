@@ -12,6 +12,8 @@ CSV_HEADER = "timestamp,speed(rpm),horizontal acceleration,gyro heading"
 SAMPLE_INTERVAL_S = 1.0
 
 PRINT_LIVE = True  # Print live RPM/pulse info
+
+
 def main():
     reader = SensorReader(print_live=PRINT_LIVE)
     reader.setup()
@@ -22,11 +24,16 @@ def main():
     with open(CSV_PATH, "a+", newline="") as f:
         f.seek(0)
         first_line = f.readline().strip()
-        if first_line != CSV_HEADER:
+        if not first_line:
             f.seek(0)
-            f.truncate()
             f.write(CSV_HEADER + "\n")
             f.flush()
+        elif first_line != CSV_HEADER:
+            print(
+                "Warning: existing CSV header differs from current format. "
+                "Appending without rewriting historical data."
+            )
+            f.seek(0, 2)
         writer = csv.writer(f)
 
         print(f"Logging to {CSV_PATH}")
@@ -34,17 +41,21 @@ def main():
 
         try:
             while True:
-                data = reader.read()
-                writer.writerow(
-                    [
-                        data["timestamp"],
-                        f"{data['rpm']:.2f}",
-                        f"{data['horiz_accel']:.3f}",
-                        f"{data['yaw_deg']:.2f}",
-                    ]
-                )
-                f.flush()
-
+                try:
+                    data = reader.read()
+                    writer.writerow(
+                        [
+                            data["timestamp"],
+                            f"{data['rpm']:.2f}",
+                            f"{data['horiz_accel']:.3f}",
+                            f"{data['yaw_deg']:.2f}",
+                        ]
+                    )
+                    f.flush()
+                except Exception as exc:
+                    print(f"Read/write error: {exc}. Retrying...")
+                    time.sleep(SAMPLE_INTERVAL_S)
+                    continue
                 time.sleep(SAMPLE_INTERVAL_S)
 
         except KeyboardInterrupt:

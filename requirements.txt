@@ -1,5 +1,5 @@
 pygame==2.6.1
 adafruit-blinka==8.47.0
-adafruit-circuitpython-ds3231==2.3.11
+adafruit-circuitpython-ds3231==2.4.27
 RPi.GPIO==0.7.0
 lgpio==0.2.2.0

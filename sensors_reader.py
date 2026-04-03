@@ -2,6 +2,7 @@
 """Shared sensor reader for MPU6050 + FC-33 speed + RTC on Raspberry Pi."""
 
 import math
+import threading
 import time
 from datetime import datetime
 
@@ -51,12 +52,14 @@ class SpeedCounter:
         self.gpio_pin = gpio_pin
         self.pulse_count = 0
         self.last_calc_time = time.time()
+        self._pulse_lock = threading.Lock()
         self._chip = None
         self._callback = None
         self._backend = None
 
     def _pulse_callback(self, *_args):
-        self.pulse_count += 1
+        with self._pulse_lock:
+            self.pulse_count += 1
 
     def setup(self):
         if lgpio is not None:
@@ -94,8 +97,9 @@ class SpeedCounter:
         elapsed = now - self.last_calc_time
         if elapsed <= 0:
             return 0.0, 0, elapsed
-        pulses = self.pulse_count
-        self.pulse_count = 0
+        with self._pulse_lock:
+            pulses = self.pulse_count
+            self.pulse_count = 0
         self.last_calc_time = now
         revs = pulses / float(PULSES_PER_REV)
         rpm = (revs / elapsed) * 60.0

@@ -4,12 +4,12 @@
 
 set -e
 
-echo "🚀 Initializing Vehicle-Telemetry Git repository..."
+echo "Initializing Vehicle-Telemetry Git repository..."
 echo
 
 # Check if git is installed
 if ! command -v git &> /dev/null; then
-    echo "❌ Git not installed. Install with: sudo apt-get install -y git"
+    echo "Git not installed. Install with: sudo apt-get install -y git"
     exit 1
 fi
 
@@ -17,23 +17,26 @@ cd "$(dirname "$0")"
 
 # Initialize git
 if [ -d ".git" ]; then
-    echo "⚠️  Git repo already exists. Skipping init."
+    echo "Git repo already exists. Skipping init."
 else
-    echo "✓ Initializing git repository..."
+    echo "Initializing git repository..."
     git init
-    
-    # Configure git
-    echo "📝 Configure git user (optional):"
-    git config user.name "Your Name" 2>/dev/null || true
-    git config user.email "your.email@example.com" 2>/dev/null || true
+
+    # Configure git user only if not already set (never override an existing identity)
+    if [ -z "$(git config user.name)" ]; then
+        git config user.name "Your Name"
+    fi
+    if [ -z "$(git config user.email)" ]; then
+        git config user.email "your.email@example.com"
+    fi
 fi
 
 # Add all files
-echo "✓ Adding files to git..."
+echo "Adding files to git..."
 git add .
 
 # Create initial commit
-echo "✓ Creating initial commit..."
+echo "Creating initial commit..."
 git commit -m "Initial commit: Vehicle-Telemetry v1.0.0
 
 - Real-time Pygame dashboard UI
@@ -44,7 +47,7 @@ git commit -m "Initial commit: Vehicle-Telemetry v1.0.0
 
 echo
 echo "==============================================="
-echo "✓ Git repository initialized!"
+echo "Git repository initialized!"
 echo "==============================================="
 echo
 echo "Next steps:"

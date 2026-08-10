@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- GitHub Actions CI (byte-compile check + host-agnostic smoke tests)
+- Smoke test suite under `tests/` that runs without Raspberry Pi hardware
+- SECURITY.md
 - Support for alternative I2C addresses (0x69 for MPU6050 AD0 variant)
 - Configurable sensor polling interval
 - Data export functionality (CSV, Excel)

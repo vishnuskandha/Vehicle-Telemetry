@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # requirements.txt pins Raspberry Pi hardware drivers (adafruit-blinka,
+      # lgpio, RPi.GPIO) that only install/run on ARM hardware. CI installs the
+      # host-agnostic test dependencies instead and exercises the pure logic.
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pygame
+
+      - name: Byte-compile all Python files
+        run: python -m compileall -q sensors_reader.py sensors_dashboard.py sensors_logger.py i2c_scan.py tests
+
+      - name: Run smoke tests
+        run: python -m pytest -q tests/

@@ -40,13 +40,13 @@ Follow **PEP 8** with these tools:
 
 ```bash
 # Format code
-black sensors/
+black sensors_reader.py sensors_dashboard.py sensors_logger.py i2c_scan.py
 
 # Lint
-flake8 sensors/ --max-line-length=100
+flake8 sensors_reader.py sensors_dashboard.py sensors_logger.py i2c_scan.py --max-line-length=100
 
 # Type check
-mypy sensors/
+mypy sensors_reader.py sensors_logger.py i2c_scan.py
 
 # Test
 pytest -v
@@ -74,7 +74,7 @@ Fixes #123
 - Verify hardware sensors work correctly
 
 ```bash
-pytest --cov=sensors --cov-report=html
+pytest --cov=sensors_reader.py --cov-report=html
 ```
 
 ### Documentation
@@ -227,12 +227,11 @@ vehicle-telemetry/
 
 - **Issues/PRs:** [GitHub](https://github.com/vishnuskandha/Vehicle-Telemetry)
 - **Discussions:** [GitHub Discussions](https://github.com/vishnuskandha/Vehicle-Telemetry/discussions)
-- **Email:** [maintainer@example.com]
 
 ## Questions?
 
-- Check [GITHUB.md](GITHUB.md) for repo guidelines
+- Check [docs/GITHUB.md](docs/GITHUB.md) for repo guidelines
 - Read [ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design
 - Browse [existing issues](https://github.com/vishnuskandha/Vehicle-Telemetry/issues) for answers
 
-Thank you for contributing! 🚀
+Thank you for contributing.

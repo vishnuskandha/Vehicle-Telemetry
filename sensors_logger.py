@@ -14,6 +14,18 @@ SAMPLE_INTERVAL_S = 1.0
 PRINT_LIVE = True  # Print live RPM/pulse info
 
 
+def write_sample(writer, data):
+    """Write one sensor sample; propagate storage errors to the caller."""
+    writer.writerow(
+        [
+            data["timestamp"],
+            f"{data['rpm']:.2f}",
+            f"{data['horiz_accel']:.3f}",
+            f"{data['yaw_deg']:.2f}",
+        ]
+    )
+
+
 def main():
     reader = SensorReader(print_live=PRINT_LIVE)
     reader.setup()
@@ -43,19 +55,16 @@ def main():
             while True:
                 try:
                     data = reader.read()
-                    writer.writerow(
-                        [
-                            data["timestamp"],
-                            f"{data['rpm']:.2f}",
-                            f"{data['horiz_accel']:.3f}",
-                            f"{data['yaw_deg']:.2f}",
-                        ]
-                    )
-                    f.flush()
                 except Exception as exc:
-                    print(f"Read/write error: {exc}. Retrying...")
+                    print(f"Sensor read error: {exc}. Retrying...")
                     time.sleep(SAMPLE_INTERVAL_S)
                     continue
+
+                # Storage failures are deliberately not swallowed: retrying a
+                # persistent disk/permission/full-filesystem error forever can
+                # silently turn a telemetry logger into a data-loss loop.
+                write_sample(writer, data)
+                f.flush()
                 time.sleep(SAMPLE_INTERVAL_S)
 
         except KeyboardInterrupt:

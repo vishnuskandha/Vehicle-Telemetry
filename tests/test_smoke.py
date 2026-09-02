@@ -85,6 +85,25 @@ def test_progress_ring_clamps_value():
     assert ring.target_value == -10
 
 
+def test_write_sample_formats_telemetry_row():
+    from sensors_logger import write_sample
+
+    rows = []
+    data = {
+        "timestamp": "2026-09-02 14:00:00",
+        "rpm": 123.456,
+        "horiz_accel": 9.8765,
+        "yaw_deg": 12.3456,
+    }
+
+    class Writer:
+        def writerow(self, row):
+            rows.append(row)
+
+    write_sample(Writer(), data)
+    assert rows == [["2026-09-02 14:00:00", "123.46", "9.877", "12.35"]]
+
+
 def test_i2c_scan_functions_exist():
     import i2c_scan
 

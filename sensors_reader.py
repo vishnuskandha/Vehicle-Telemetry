@@ -30,6 +30,7 @@ SPEED_GPIO = 27  # GPIO27 (pin 13)
 PULL_UP = True  # Enable internal pull-up
 PULSES_PER_REV = 40  # Measured: 40 edges per rotation
 COUNT_BOTH_EDGES = True  # Count rising + falling edges
+PULSE_DEBOUNCE_S = 0.005  # Match the RPi.GPIO 5 ms debounce on lgpio
 
 # MPU6050 address: 0x68 default, 0x69 if AD0 is pulled high
 MPU_ADDRS = [0x68, 0x69]
@@ -51,14 +52,22 @@ class SpeedCounter:
     def __init__(self, gpio_pin):
         self.gpio_pin = gpio_pin
         self.pulse_count = 0
-        self.last_calc_time = time.time()
+        self.last_calc_time = time.monotonic()
+        self._last_pulse_time = None
         self._pulse_lock = threading.Lock()
         self._chip = None
         self._callback = None
         self._backend = None
 
     def _pulse_callback(self, *_args):
+        now = time.monotonic()
         with self._pulse_lock:
+            if (
+                self._last_pulse_time is not None
+                and now - self._last_pulse_time < PULSE_DEBOUNCE_S
+            ):
+                return
+            self._last_pulse_time = now
             self.pulse_count += 1
 
     def setup(self):
@@ -93,7 +102,7 @@ class SpeedCounter:
         self._backend = "rpi-gpio"
 
     def read_rpm(self):
-        now = time.time()
+        now = time.monotonic()
         elapsed = now - self.last_calc_time
         if elapsed <= 0:
             return 0.0, 0, elapsed
@@ -139,7 +148,6 @@ class RawMPU:
     def __init__(self, i2c, addr):
         self.i2c = i2c
         self.addr = addr
-        # Wake device
         self.i2c.writeto(self.addr, bytes([MPU_REG_PWR_MGMT_1, 0x00]))
 
     def read_accel(self):
@@ -158,7 +166,6 @@ class RawMPU:
         gx = to_int16(data[0], data[1])
         gy = to_int16(data[2], data[3])
         gz = to_int16(data[4], data[5])
-        # Convert to rad/s
         return (
             math.radians(gx / GYRO_LSB_PER_DPS),
             math.radians(gy / GYRO_LSB_PER_DPS),
@@ -231,13 +238,13 @@ class SensorReader:
         self.speed = SpeedCounter(self.speed_gpio)
         self.speed.setup()
         self.yaw_deg = 0.0
-        self.last_time = time.time()
+        self.last_time = time.monotonic()
 
     def read(self):
         if self.speed is None or self.mpu is None:
             raise RuntimeError("SensorReader.setup() must be called first.")
 
-        now = time.time()
+        now = time.monotonic()
         dt = now - self.last_time if self.last_time else 0.0
         self.last_time = now
 

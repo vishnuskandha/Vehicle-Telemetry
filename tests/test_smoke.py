@@ -46,8 +46,37 @@ def test_speed_counter_reads_rpm_with_fake_pulses():
     counter.pulse_count = 40
     rpm, pulses, elapsed = counter.read_rpm()
     assert pulses == 40
-    assert elapsed >= 0
+    assert elapsed > 0
     assert rpm == pytest.approx(60.0 / elapsed)
+
+
+def test_speed_counter_debounces_rapid_pulses(monkeypatch):
+    from sensors_reader import PULSE_DEBOUNCE_S, SpeedCounter
+
+    counter = SpeedCounter(gpio_pin=27)
+    now = iter((10.0, 10.0 + PULSE_DEBOUNCE_S / 2, 10.0 + PULSE_DEBOUNCE_S * 2))
+    monkeypatch.setattr("sensors_reader.time.monotonic", lambda: next(now))
+
+    counter._pulse_callback()
+    counter._pulse_callback()
+    counter._pulse_callback()
+
+    assert counter.pulse_count == 2
+
+
+def test_speed_counter_uses_monotonic_clock(monkeypatch):
+    from sensors_reader import SpeedCounter
+
+    counter = SpeedCounter(gpio_pin=27)
+    counter.last_calc_time = 100.0
+    monkeypatch.setattr("sensors_reader.time.monotonic", lambda: 101.0)
+
+    counter.pulse_count = 40
+    rpm, pulses, elapsed = counter.read_rpm()
+
+    assert pulses == 40
+    assert elapsed == pytest.approx(1.0)
+    assert rpm == pytest.approx(60.0)
 
 
 def test_lerp_color_endpoints():

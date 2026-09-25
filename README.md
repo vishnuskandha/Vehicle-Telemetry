@@ -1,5 +1,15 @@
 # Vehicle Telemetry
 
+
+<!-- README polish: repository metadata badges -->
+<p>
+  <a href="https://github.com/vishnuskandha/Vehicle-Telemetry"><img alt="GitHub stars" src="https://img.shields.io/github/stars/vishnuskandha/Vehicle-Telemetry?style=for-the-badge&logo=github&label=Stars"></a>
+  <a href="https://github.com/vishnuskandha/Vehicle-Telemetry/fork"><img alt="GitHub forks" src="https://img.shields.io/github/forks/vishnuskandha/Vehicle-Telemetry?style=for-the-badge&logo=github&label=Forks"></a>
+  <a href="https://github.com/vishnuskandha/Vehicle-Telemetry/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/vishnuskandha/Vehicle-Telemetry?style=for-the-badge&logo=github&label=Issues"></a>
+  <a href="https://github.com/vishnuskandha/Vehicle-Telemetry/commits"><img alt="Last commit" src="https://img.shields.io/github/last-commit/vishnuskandha/Vehicle-Telemetry?style=for-the-badge&logo=git&label=Updated"></a>
+</p>
+<!-- End README polish -->
+
 Real-time vehicle sensor monitoring system for Raspberry Pi 5 with a live dashboard UI.
 
 [![CI](https://github.com/vishnuskandha/Vehicle-Telemetry/actions/workflows/ci.yml/badge.svg)](https://github.com/vishnuskandha/Vehicle-Telemetry/actions/workflows/ci.yml)

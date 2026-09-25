@@ -1,4 +1,8 @@
+<div align="center">
+
 # Vehicle Telemetry
+
+</div>
 
 
 <!-- README polish: repository metadata badges -->
